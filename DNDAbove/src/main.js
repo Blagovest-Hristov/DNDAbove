@@ -8,9 +8,9 @@ import Account from './components/AccountPage.vue'
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/login', component: Login },
-    { path: '/campaigns', component: Campaigns },
-    { path: '/account', component: Account },
+    { path: '/login', component: Login, name: 'login'},
+    { path: '/campaigns', component: Campaigns, name: 'campaigns'},
+    { path: '/account', component: Account, name: 'account'},
     { path: '/', redirect: '/login' },
     // other routes...
   ],

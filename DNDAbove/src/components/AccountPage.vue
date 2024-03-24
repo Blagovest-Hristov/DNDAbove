@@ -25,10 +25,11 @@ export default {
   async mounted() {
     onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        const userRef = doc(collection(firestore, 'users'), currentUser.uid);
+        const userRef = doc(collection(firestore, 'players'), currentUser.uid);
         const docSnap = await getDoc(userRef);
         if (docSnap.exists()) {
           this.user = docSnap.data();
+          console.log("success", this.user);
         }
       }
     });

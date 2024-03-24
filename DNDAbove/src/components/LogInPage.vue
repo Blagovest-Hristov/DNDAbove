@@ -20,8 +20,10 @@
 </template>
 
 <script>
-import { auth } from './firebase'; // replace '@/firebase' with the path to your firebase.js file
+import { auth, firestore } from './firebase'; 
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
 
 export default {
   data() {
@@ -45,8 +47,15 @@ export default {
     },
     register() {
       createUserWithEmailAndPassword(auth, this.email, this.password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
           console.log(userCredential.user);
+          // Create a document in the 'players' collection
+          const userRef = doc(firestore, 'players', userCredential.user.uid);
+          await setDoc(userRef, {
+            email: this.email,
+            userId: userCredential.user.uid,
+            username: this.username
+          });
           this.$router.push('/account');
         })
         .catch((error) => {

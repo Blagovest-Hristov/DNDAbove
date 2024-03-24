@@ -11,46 +11,82 @@
         <form v-if="showCampaignForm" @submit="createCampaign">
             <!-- Add form fields for campaign details -->
         </form>
+        <div v-if="showCampaignForm">
+            <form @submit.prevent="createCampaign">
+              <label for="campaignName">Campaign Name:</label>
+              <input id="campaignName" v-model="campaignName" required>
+      
+              <label for="description">Description:</label>
+              <textarea id="description" v-model="description"></textarea>
+      
+              <label for="location">Location:</label>
+              <input id="location" v-model="location">
+      
+              <button type="submit">Create Campaign</button>
+            </form>
+          </div>
     </div>
 </template>
 
 <script>
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { ref, onMounted } from 'vue';
+import { auth, firestore } from './firebase';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default {
-    name: 'CampaignsPage',
-    data() {
-        return {
-            campaigns: [],
-            showCampaignForm: false,
-        };
-    },
-    mounted() {
-        // Assuming you have already initialized Firebase in your project
-        const db = firebase.firestore();
-        const currentUser = firebase.auth().currentUser;
+  setup() {
+    const campaigns = ref([]);
+    const showCampaignForm = ref(false);
+    const campaignName = ref('');
+    const description = ref('');
+    const location = ref('');
 
-        // Fetch campaigns with the same dungeonMasterId as the current user
-        db.collection('campaigns')
-            .where('dungeonMasterId', '==', currentUser.uid)
-            .get()
-            .then((querySnapshot) => {
-                querySnapshot.forEach((doc) => {
-                    this.campaigns.push(doc.data());
-                });
-            })
-            .catch((error) => {
-                console.error('Error fetching campaigns:', error);
-            });
-    },
-    methods: {
-        showForm() {
-            this.showCampaignForm = true;
-        },
-        createCampaign() {
-            // Implement the logic to create a new campaign in the database
-        },
-    },
+    onMounted(async () => {
+      const db = firestore;
+      const currentUser = auth.currentUser;
+
+      const campaignsCollection = collection(db, 'campaigns');
+      const q = query(campaignsCollection, where('dungeonMasterId', '==', currentUser.uid));
+
+      try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+          campaigns.value.push(doc.data());
+        });
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+      }
+    });
+
+    const createCampaign = async () => {
+      const db = firestore;
+      const currentUser = auth.currentUser;
+
+      const campaignsCollection = collection(db, 'campaigns');
+
+      try {
+        const docRef = await addDoc(campaignsCollection, {
+          campaignId: '', // replace with the actual campaignId
+          campaignName: campaignName.value,
+          createdTimestamp: serverTimestamp(),
+          description: description.value,
+          dungeonMasterId: currentUser.uid,
+          location: location.value,
+          updatedTimestamp: serverTimestamp(),
+        });
+
+        console.log('Document written with ID: ', docRef.id);
+
+        // Clear the form
+        campaignName.value = '';
+        description.value = '';
+        location.value = '';
+      } catch (error) {
+        console.error('Error adding document: ', error);
+      }
+    };
+
+    return { campaigns, showCampaignForm, createCampaign, campaignName, description, location };
+  },
 };
 </script>
