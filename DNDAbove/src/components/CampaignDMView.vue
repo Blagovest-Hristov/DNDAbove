@@ -1,8 +1,9 @@
 <template>
   <div>
-    <h1>{{ campaign.campaignName }}</h1>
-    <p>{{ campaign.description }}</p>
-
+    <div v-if="loading">Loading...</div>
+    <div v-else>
+      <h1>{{ campaign.campaignName }}</h1>
+    </div>
     <h2>Players</h2>
     <input v-model="newPlayerEmail" placeholder="Enter player email">
     <button @click="addPlayer">Add Player</button>
@@ -40,12 +41,9 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { firestore } from './firebase';
-import { collection, doc, getDocs, addDoc } from 'firebase/firestore';
-import axios from 'axios';
+import { collection, doc, getDocs, getDoc } from 'firebase/firestore';
 
-const axiosInstance = axios.create({
-  baseURL: 'https://www.dnd5eapi.co/api/'
-});
+
 
 export default {
   props: ['campaignId'],
@@ -61,47 +59,25 @@ export default {
 
     const db = firestore;
     const campaignDocRef = doc(db, 'campaigns', props.campaignId);
-    const campaignDoc = getDocs(campaignDocRef);
 
     onMounted(async () => {
+      const campaignDocSnap = await getDoc(campaignDocRef);
 
-      campaign.value = campaignDoc.data();
+      if (campaignDocSnap.exists()) {
+        campaign.value = { id: campaignDocSnap.id, ...campaignDocSnap.data() };
 
-      // Fetch the player references from the campaign document
-      const playerRefs = campaign.value.players;
-      for (const playerRef of playerRefs) {
-        const playerDoc = await getDocs(playerRef);
-        players.value.push(playerDoc.data());
+        const playersCollectionRef = collection(campaignDocRef, 'players');
+        const playersQuerySnapshot = await getDocs(playersCollectionRef);
+
+        playersQuerySnapshot.forEach((doc) => {
+          players.value.push({ id: doc.id, ...doc.data() });
+        });
+      } else {
+        console.log('No such document!');
       }
-
-      // Fetch data from the D&D 5e API
-      const monsterResponse = await axiosInstance.get('monsters');
-      monsters.value = monsterResponse.data.results;
-      const itemResponse = await axiosInstance.get('equipment');
-      items.value = itemResponse.data.results;
     });
 
-    const addPlayer = async () => {
-      const playersCollectionRef = collection(campaignDocRef, 'players');
-      await addDoc(playersCollectionRef, { email: newPlayerEmail.value });
-      newPlayerEmail.value = '';
-    };
-
-    const addMonster = async () => {
-      const monstersCollectionRef = collection(campaignDocRef, 'monsters');
-      const monsterResponse = await axiosInstance.get(selectedMonster.value);
-      await addDoc(monstersCollectionRef, monsterResponse.data);
-      selectedMonster.value = null;
-    };
-
-    const addItem = async () => {
-      const itemsCollectionRef = collection(campaignDocRef, 'items');
-      const itemResponse = await axiosInstance.get(selectedItem.value);
-      await addDoc(itemsCollectionRef, itemResponse.data);
-      selectedItem.value = null;
-    };
-
-    return { campaign, players, monsters, characters, items, newPlayerEmail, selectedMonster, selectedItem, addPlayer, addMonster, addItem };
+    return { campaign, players, monsters, characters, items, newPlayerEmail, selectedMonster, selectedItem };
   },
 };
 </script>
