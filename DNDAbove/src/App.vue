@@ -1,14 +1,15 @@
 <template>
   <div id="app">
-    <nav v-if="showNavbar">
-      <router-link to="/campaigns">Campaigns</router-link> |
-      <router-link to="/account">Profile</router-link>
+    <nav v-if="showNavbar" class="navbar">
+      <router-link class="nav-link" to="/campaigns">Campaigns</router-link> |
+      <router-link class="nav-link" to="/account">Profile</router-link>
     </nav>
     <router-view />
   </div>
 </template>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
 export default {
   name: 'App',
   data() {
@@ -28,66 +29,50 @@ export default {
 </script>
 
 
-<style >
-  body {
-    background-color: darkgray;
-    color: #e02b2b; /* paler shade of red */
-    font-family: 'Roboto', sans-serif; /* Roboto font */
-    text-align: center; /* center the text */
-  }
+<style>
+body {
+  background-color: darkgray;
+  font-family: 'Roboto', sans-serif; /* Roboto font */
+}
 
-  h1, h2 {
-    color: #e02b2b; /* paler shade of red */
-  }
+.navbar {
+  background-color: #333;
+  padding: 10px;
+  color: white;
+}
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
+.nav-link {
+  color: white;
+  text-decoration: none;
+  margin: 0 10px;
+}
 
-  li {
-    margin: 20px auto; /* center the list items */
-    padding: 20px;
-    border: 1px solid #e02b2b; /* paler shade of red */
-    border-radius: 5px;
-    background-color: #333;
-    color: #e02b2b; /* paler shade of red */
-    width: 80%; /* adjust as needed */
-    max-width: 600px; /* adjust as needed */
-  }
+.nav-link:hover {
+  color: #e02b2b; /* A shade of red for hover effect */
+}
 
-  form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
+button {
+  background-color: #e02b2b; /* A shade of red for button color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
 
-  label {
-    margin: 10px 0;
-    color: #e02b2b; /* paler shade of red */
-  }
+button:hover {
+  background-color: darkred; /* Darker shade of red for button hover color */
+}
 
-  input, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #e02b2b; /* paler shade of red */
-    border-radius: 5px;
-    background-color: #333;
-    color: #e02b2b; /* paler shade of red */
-  }
+.list-group-item {
+  background-color: #333; /* Dark gray background color */
+  color: white; /* White text color */
+  border: none; /* Remove border */
+}
 
-  button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #e02b2b; /* paler shade of red */
-    color: darkgray;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #ff4d4d; /* darker shade of red */
-  }
 </style>

@@ -44,10 +44,10 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { auth, firestore } from './firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, setDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp, setDoc, doc, getDoc, query, where } from 'firebase/firestore';
 
 export default {
   setup() {
@@ -60,38 +60,53 @@ export default {
     const playerEmails = ref('');
     const router = useRouter();
 
+    let unsubscribe;
+
     onMounted(async () => {
-      const db = firestore;
-      const currentUser = auth.currentUser;
+      unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const db = firestore;
+          const campaignsDMCollection = collection(db, 'campaigns');
+          const q = query(campaignsDMCollection, where('dungeonMasterId', '==', user.uid));
 
-      const campaignsCollection = collection(db, 'campaigns');
-      const q = query(campaignsCollection, where('dungeonMasterId', '==', currentUser.uid));
-
-      try {
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-          campaigns.value.push({ id: doc.id, ...doc.data() });
-        });
-      } catch (error) {
-        console.error('Error fetching campaigns:', error);
-      }
-
-      // Fetch campaigns where the current user is a player
-      const campaignDocs = await getDocs(campaignsCollection);
-
-      for (const campaignDoc of campaignDocs.docs) {
-        const playersCollectionRef = collection(db, 'campaigns', campaignDoc.id, 'players');
-        const playersQuerySnapshot = await getDocs(playersCollectionRef);
-
-        for (let docSnapshot of playersQuerySnapshot.docs) {
-          const playerDocRef = docSnapshot.data().ref;
-          const playerDocSnap = await getDoc(playerDocRef);
-
-          if (playerDocSnap.exists() && playerDocSnap.id === currentUser.uid) {
-            playerCampaigns.value.push({ id: campaignDoc.id, ...campaignDoc.data() });
-            break; // Exit the inner loop as soon as the current user is found
+          try {
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+              campaigns.value.push({ id: doc.id, ...doc.data() });
+            });
+          } catch (error) {
+            console.error('Error fetching campaigns:', error);
           }
+
+          const campaignsCollection = collection(db, 'campaigns');
+          const campaignDocs = await getDocs(campaignsCollection);
+
+          for (const campaignDoc of campaignDocs.docs) {
+            const playersCollectionRef = collection(db, 'campaigns', campaignDoc.id, 'players');
+            const playersQuerySnapshot = await getDocs(playersCollectionRef);
+
+            for (let docSnapshot of playersQuerySnapshot.docs) {
+              const playerRef = docSnapshot.data().ref; // Get the player's Firestore reference
+
+              if (playerRef) {
+                const playerDocSnap = await getDoc(playerRef);
+
+                if (playerDocSnap.exists() && playerDocSnap.id === user.uid) {
+                  playerCampaigns.value.push({ id: campaignDoc.id, ...campaignDoc.data() });
+                  break; // Exit the inner loop as soon as the current user is found
+                }
+              }
+            }
+          }
+        } else {
+          console.log('No user is currently signed in');
         }
+      });
+    });
+
+    onUnmounted(() => {
+      if (unsubscribe) {
+        unsubscribe();
       }
     });
 
@@ -101,10 +116,9 @@ export default {
 
     const createCampaign = async () => {
       const db = firestore;
-      const currentUser = auth.currentUser;
+      const user = auth.currentUser;
 
-      // Check if a user is signed in
-      if (!currentUser) {
+      if (!user) {
         console.error('No user is currently signed in');
         return;
       }
@@ -117,7 +131,7 @@ export default {
           campaignName: campaignName.value,
           createdTimestamp: serverTimestamp(),
           description: description.value,
-          dungeonMasterId: currentUser.uid,
+          dungeonMasterId: user.uid,
           location: location.value,
           updatedTimestamp: serverTimestamp(),
         });

@@ -14,20 +14,39 @@
     </ul>
 
     <h2>Monsters</h2>
-    <select v-model="selectedMonster">
+    <button @click="showMonsterList = !showMonsterList" class="btn btn-primary">{{ showMonsterList ? 'Hide' : 'Show' }} Monster List</button>
+    <div v-if="showMonsterList">
+      <input v-model="monsterSearchQuery" placeholder="Search for a monster" class="form-control">
+      <ul class="list-group-item">
+        <li v-for="monster in filteredCampaignMonsters" :key="monster.id" @click="activateMonster(monster)">
+          {{ monster.name }}
+        </li>
+      </ul>
+    </div>
+    <select v-model="selectedMonster" class="form-select">
       <option v-for="monster in monsters" :key="monster.index" :value="monster">
         {{ monster.name }}
       </option>
     </select>
-    <button @click="addMonsterToCampaign">Add Monster</button>
+    <button @click="addMonsterToCampaign" class="btn btn-primary">Add Monster</button>
+
+
+    <h2>Active Monsters</h2>
+    <ul>
+      <li v-for="(monster, index) in activeMonsters" :key="monster.id">
+        <h3>{{ monster.name }}</h3>
+        - HP:
+        <input type="number" v-model="monster.hp" @change="checkHP(index)" class="form-control">
+      </li>
+    </ul>
 
     <h2>Items</h2>
-    <select v-model="selectedItem">
+    <select v-model="selectedItem" class="form-select">
       <option v-for="item in items" :key="item.index" :value="item">
         {{ item.name }}
       </option>
     </select>
-    <button @click="addItemToCampaign">Add Item</button>
+    <button @click="addItemToCampaign" class="btn btn-primary">Add Item</button>
 
     <h2>Characters</h2>
     <ul>
@@ -39,7 +58,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { firestore } from './firebase';
 import { collection, doc, getDocs, getDoc, addDoc, query, where } from 'firebase/firestore';
 
@@ -49,16 +68,29 @@ export default {
     const campaign = ref(null);
     const players = ref([]);
     const monsters = ref([]);
+    const campaignMonsters = ref([]);
     const characters = ref([]);
     const items = ref([]);
     const newPlayerEmail = ref('');
     const selectedMonster = ref(null);
     const selectedItem = ref(null);
+    const monsterSearchQuery = ref('');
+    const showMonsterList = ref(true);
+    const activeMonsters = ref([]);
 
     const db = firestore;
     const campaignDocRef = doc(db, 'campaigns', props.campaignId);
 
+    const filteredCampaignMonsters = computed(() => {
+      if (!monsterSearchQuery.value) {
+        return campaignMonsters.value;
+      }
+
+      return campaignMonsters.value.filter(monster => monster.name.toLowerCase().includes(monsterSearchQuery.value.toLowerCase()));
+    });
+
     onMounted(async () => {
+      console.log(filteredCampaignMonsters)
       // Fetch monsters
       const monstersResponse = await fetch('https://www.dnd5eapi.co/api/monsters');
       const monstersData = await monstersResponse.json();
@@ -83,6 +115,11 @@ export default {
             players.value.push({ id: playerDocSnap.id, username: playerDocSnap.data().username });
           }
         }
+
+        // Fetch monsters from the subcollection
+        const monstersCollectionRef = collection(db, 'campaigns', props.campaignId, 'monsters');
+        const monstersQuerySnapshot = await getDocs(monstersCollectionRef);
+        campaignMonsters.value = monstersQuerySnapshot.docs.map(doc => doc.data());
       } else {
         console.log('No such document!');
       }
@@ -99,8 +136,7 @@ export default {
           const playersCollectionRef = collection(db, 'campaigns', props.campaignId, 'players');
           await addDoc(playersCollectionRef, playerData);
           players.value.push({ id: userDocSnap.id, username: userDocSnap.data().username });
-        }
-        else {
+        } else {
           console.log('No such document in players collection!');
         }
         newPlayerEmail.value = '';
@@ -110,6 +146,7 @@ export default {
     const addMonsterToCampaign = async () => {
       const monstersCollectionRef = collection(campaignDocRef, 'monsters');
       await addDoc(monstersCollectionRef, selectedMonster.value);
+      campaignMonsters.value.push(selectedMonster.value);
     };
 
     const addItemToCampaign = async () => {
@@ -117,7 +154,56 @@ export default {
       await addDoc(itemsCollectionRef, selectedItem.value);
     };
 
-    return { campaign, players, monsters, characters, items, newPlayerEmail, selectedMonster, selectedItem, addPlayer, addMonsterToCampaign, addItemToCampaign };
+    const activateMonster = async (monster) => {
+      activeMonsters.value.push(monster);
+      if (!campaignMonsters.value.includes(monster)) {
+        campaignMonsters.value.push(monster);
+      }
+
+      const slug = formatSlug(monster.name);
+      const response = await fetch(`https://www.dnd5eapi.co/api/monsters/${slug}`);
+      const data = await response.json();
+      monster.hp = data.hit_points;
+    };
+
+    const checkHP = (index) => {
+      if (activeMonsters.value[index].hp <= 0) {
+        activeMonsters.value.splice(index, 1);
+      }
+    };
+
+    const decreaseHP = (index, amount) => {
+      activeMonsters.value[index].hp -= amount;
+      if (activeMonsters.value[index].hp <= 0) {
+        activeMonsters.value.splice(index, 1);
+      }
+    };
+
+    const formatSlug = (name) => {
+      return name.toLowerCase().replace(/\s+/g, '-');
+    };
+
+    return {
+      checkHP,
+      decreaseHP,
+      activeMonsters,
+      activateMonster,
+      campaign,
+      players,
+      monsters,
+      campaignMonsters,
+      filteredCampaignMonsters,
+      characters,
+      items,
+      newPlayerEmail,
+      selectedMonster,
+      selectedItem,
+      monsterSearchQuery,
+      showMonsterList,
+      addPlayer,
+      addMonsterToCampaign,
+      addItemToCampaign,
+    };
   },
 };
 </script>
