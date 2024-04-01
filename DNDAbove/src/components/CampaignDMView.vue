@@ -14,7 +14,8 @@
     </ul>
 
     <h2>Monsters</h2>
-    <button @click="showMonsterList = !showMonsterList" class="btn btn-primary">{{ showMonsterList ? 'Hide' : 'Show' }} Monster List</button>
+    <button @click="showMonsterList = !showMonsterList" class="btn btn-primary">{{ showMonsterList ? 'Hide' : 'Show' }}
+      Monster List</button>
     <div v-if="showMonsterList">
       <input v-model="monsterSearchQuery" placeholder="Search for a monster" class="form-control">
       <ul class="list-group-item">
@@ -61,6 +62,8 @@
 import { ref, onMounted, computed } from 'vue';
 import { firestore } from './firebase';
 import { collection, doc, getDocs, getDoc, addDoc, query, where } from 'firebase/firestore';
+import { useRoute, useRouter } from 'vue-router';
+
 
 export default {
   props: ['campaignId'],
@@ -78,6 +81,8 @@ export default {
     const showMonsterList = ref(true);
     const activeMonsters = ref([]);
 
+    const route = useRoute();
+    const router = useRouter();
     const db = firestore;
     const campaignDocRef = doc(db, 'campaigns', props.campaignId);
 
@@ -106,14 +111,22 @@ export default {
       if (campaignDocSnap.exists()) {
         campaign.value = { id: campaignDocSnap.id, ...campaignDocSnap.data() };
 
+        if (campaign.value.dm !== route.params.userId) {
+          router.push(`/player/${props.campaignId}`);
+        }
+
         const playersCollectionRef = collection(db, 'campaigns', props.campaignId, 'players');
         const playersQuerySnapshot = await getDocs(playersCollectionRef);
         for (let docSnapshot of playersQuerySnapshot.docs) {
           const playerDocRef = docSnapshot.data().ref;
-          const playerDocSnap = await getDoc(playerDocRef);
-          if (playerDocSnap.exists()) {
+          if (playerDocRef) {
+            const playerDocSnap = await getDoc(playerDocRef);
+            if (playerDocSnap.exists()) {
             players.value.push({ id: playerDocSnap.id, username: playerDocSnap.data().username });
+          }          } else {
+            console.log('No account with this email');
           }
+         
         }
 
         // Fetch monsters from the subcollection

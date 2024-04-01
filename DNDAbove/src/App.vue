@@ -75,4 +75,11 @@ button:hover {
   border: none; /* Remove border */
 }
 
+router-link-exact-active,
+router-link-active {
+  text-decoration: none;
+  color: inherit;
+}
+
+
 </style>

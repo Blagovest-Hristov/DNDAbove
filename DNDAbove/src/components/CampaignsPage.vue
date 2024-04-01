@@ -2,7 +2,7 @@
   <div>
     <h1>My Campaigns</h1>
     <ul v-if="campaigns.length > 0">
-      <li v-for="campaign in campaigns" :key="campaign.id">
+      <li class="list-group-item"  v-for="campaign in campaigns" :key="campaign.id">
         <router-link :to="{ name: 'CampaignDMView', params: { campaignId: campaign.id } }">
           <h2>{{ campaign.campaignName }}</h2>
           <p>{{ campaign.description }}</p>
@@ -12,7 +12,7 @@
     </ul>
     <h1>Player Campaigns</h1>
     <ul v-if="playerCampaigns.length > 0">
-      <li v-for="campaign in playerCampaigns" :key="campaign.id">
+      <li class="list-group-item" v-for="campaign in playerCampaigns" :key="campaign.id">
         <router-link :to="{ name: 'CampaignPlayerView', params: { campaignId: campaign.id } }">
           <h2>{{ campaign.campaignName }}</h2>
           <p>{{ campaign.description }}</p>
