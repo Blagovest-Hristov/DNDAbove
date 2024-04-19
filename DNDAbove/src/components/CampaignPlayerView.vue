@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>Welcome to your Vue page!</h1>
         <p>Campaign ID: {{ campaignId }}</p> <!-- Display the campaign ID -->
 
         <h2>Your Characters</h2>
