@@ -12,8 +12,10 @@
     </footer>
   </div>
 </template>
+
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
+
 export default {
   name: 'App',
   data() {
@@ -22,16 +24,18 @@ export default {
     };
   },
   watch: {
-    '$route' (to) {
+    '$route'(to) {
       this.showNavbar = to.name !== 'login';
     }
   },
   created() {
     this.showNavbar = this.$route.name !== 'login';
+
+    // Example: Show error notification
+    this.$toast.error('Error message goes here');
   }
 }
 </script>
-
 <style>
 /* Global Styles */
 @font-face {

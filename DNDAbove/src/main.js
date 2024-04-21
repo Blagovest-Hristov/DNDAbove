@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import App from './App.vue'
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-default.css';
 import Login from './components/LogInPage.vue'
 import Campaigns from './components/CampaignsPage.vue'
 import Account from './components/AccountPage.vue'
@@ -41,7 +43,7 @@ const router = createRouter({
 })
 
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(VueToast).use(router).mount('#app')
 
   
   
