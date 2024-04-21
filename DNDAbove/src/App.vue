@@ -4,10 +4,14 @@
       <router-link class="nav-link" to="/campaigns">Campaigns</router-link> |
       <router-link class="nav-link" to="/account">Profile</router-link>
     </nav>
-    <router-view />
+    <div class="content">
+      <router-view />
+    </div>
+    <footer class="footer">
+      <p>&copy; 2024 Your Company | Licensed under MIT License</p>
+    </footer>
   </div>
 </template>
-
 <script>
 import 'bootstrap/dist/css/bootstrap.css'
 export default {
@@ -19,26 +23,42 @@ export default {
   },
   watch: {
     '$route' (to) {
-      this.showNavbar = to.name !== 'login'; // compare with the name of the route
+      this.showNavbar = to.name !== 'login';
     }
   },
   created() {
-    this.showNavbar = this.$route.name !== 'login'; // compare with the name of the route
+    this.showNavbar = this.$route.name !== 'login';
   }
 }
 </script>
 
-
 <style>
+/* Global Styles */
+@font-face {
+  font-family: myFont;
+  src: url(./assets/Heroarcherfreeversion-Regular.ttf);
+}
+
 body {
-  background-color: darkgray;
-  font-family: 'Roboto', sans-serif; /* Roboto font */
+  background-color: #f5f5f5; /* Light gray background */
+  font-family: 'myFont', sans-serif; /* Custom font family */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure full viewport height */
+  margin: 0;
+}
+
+#app {
+  flex: 1; /* Allow app container to grow */
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
   background-color: #333;
-  padding: 10px;
   color: white;
+  padding: 10px;
+  text-align: center;
 }
 
 .nav-link {
@@ -48,38 +68,51 @@ body {
 }
 
 .nav-link:hover {
-  color: #e02b2b; /* A shade of red for hover effect */
+  color: #e02b2b; /* Red color on hover */
 }
 
+.content {
+  flex: 1; /* Allow content to grow and fill remaining space */
+  padding: 20px; /* Add padding for content area */
+}
+
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Button Styles */
 button {
-  background-color: #e02b2b; /* A shade of red for button color */
+  background-color: #e02b2b;
   color: white;
   border: none;
   padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
-  transition-duration: 0.4s;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: darkred; /* Darker shade of red for button hover color */
+  background-color: #c80000; /* Darker red on hover */
 }
 
-.list-group-item {
-  background-color: #333; /* Dark gray background color */
-  color: white; /* White text color */
-  border: none; /* Remove border */
+/* Ensure footer stays at bottom */
+html {
+  position: relative;
+  min-height: 100%;
 }
 
-router-link-exact-active,
-router-link-active {
-  text-decoration: none;
-  color: inherit;
+body {
+  margin-bottom: 60px; /* Height of the footer */
 }
 
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
 
+/* Page-specific styles can be added here */
 </style>

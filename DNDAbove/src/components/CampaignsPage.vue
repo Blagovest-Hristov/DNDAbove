@@ -1,47 +1,66 @@
 <template>
-  <div>
-    <h1>My Campaigns</h1>
-    <ul v-if="campaigns.length > 0">
-      <li class="list-group-item"  v-for="campaign in campaigns" :key="campaign.id">
-        <router-link :to="{ name: 'CampaignDMView', params: { campaignId: campaign.id } }">
-          <h2>{{ campaign.campaignName }}</h2>
-          <p>{{ campaign.description }}</p>
-          <p>{{ campaign.location }}</p>
-        </router-link>
-      </li>
-    </ul>
-    <h1>Player Campaigns</h1>
-    <ul v-if="playerCampaigns.length > 0">
-      <li class="list-group-item" v-for="campaign in playerCampaigns" :key="campaign.id">
-        <router-link :to="{ name: 'CampaignPlayerView', params: { campaignId: campaign.id } }">
-          <h2>{{ campaign.campaignName }}</h2>
-          <p>{{ campaign.description }}</p>
-          <p>{{ campaign.location }}</p>
-        </router-link>
-      </li>
-    </ul>
-    <p>or</p>
-    <h1>Create a new adventure</h1>
-    <button @click="showForm">New Campaign</button>
-    <div v-if="showCampaignForm">
-      <form @submit.prevent="createCampaign">
-        <label for="campaignName">Campaign Name:</label>
-        <input id="campaignName" v-model="campaignName" required>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <h1 class="text-center">My Campaigns</h1>
 
-        <label for="description">Description:</label>
-        <textarea id="description" v-model="description"></textarea>
+        <ul v-if="campaigns.length > 0" class="list-group">
+          <li class="list-group-item" v-for="campaign in campaigns" :key="campaign.id">
+            <router-link :to="{ name: 'CampaignDMView', params: { campaignId: campaign.id } }">
+              <h2>{{ campaign.campaignName }}</h2>
+              <p>{{ campaign.description }}</p>
+              <p>{{ campaign.location }}</p>
+            </router-link>
+          </li>
+        </ul>
 
-        <label for="location">Location:</label>
-        <input id="location" v-model="location">
+        <h1 class="text-center mt-4">Player Campaigns</h1>
 
-        <label for="playerEmails">Player Emails:</label>
-        <input id="playerEmails" v-model="playerEmails" placeholder="Enter emails separated by commas">
+        <ul v-if="playerCampaigns.length > 0" class="list-group">
+          <li class="list-group-item" v-for="campaign in playerCampaigns" :key="campaign.id">
+            <router-link :to="{ name: 'CampaignPlayerView', params: { campaignId: campaign.id } }">
+              <h2>{{ campaign.campaignName }}</h2>
+              <p>{{ campaign.description }}</p>
+              <p>{{ campaign.location }}</p>
+            </router-link>
+          </li>
+        </ul>
 
-        <button type="submit">Create Campaign</button>
-      </form>
+        <div class="text-center mt-4">
+          <h1>Create a new adventure</h1>
+          <button @click="showForm" class="btn btn-primary">New Campaign</button>
+        </div>
+
+        <div v-if="showCampaignForm" class="mt-4">
+          <form @submit.prevent="createCampaign">
+            <div class="form-group">
+              <label for="campaignName">Campaign Name:</label>
+              <input id="campaignName" v-model="campaignName" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description:</label>
+              <textarea id="description" v-model="description" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="location">Location:</label>
+              <input id="location" v-model="location" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="playerEmails">Player Emails:</label>
+              <input id="playerEmails" v-model="playerEmails" class="form-control" placeholder="Enter emails separated by commas">
+            </div>
+
+            <button type="submit" class="btn btn-success">Create Campaign</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -163,3 +182,15 @@ export default {
   },
 };
 </script>
+<style scoped>
+a {
+  color: #e02b2b; /* Set link color to dark gray (#333) */
+  text-decoration: none; /* Remove underline from links */
+}
+
+/* Style for links when hovered */
+a:hover {
+  color: darkred; /* Change link color on hover to Bootstrap's primary color (#007bff) */
+  text-decoration: none; /* Remove underline on hover */
+}
+</style>

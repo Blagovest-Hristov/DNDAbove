@@ -1,21 +1,28 @@
 <template>
   <div>
-    <div v-if="!isRegistered">
-      <h2>Login</h2>
-      <input type="email" v-model="email" placeholder="Email">
-      <input type="password" v-model="password" placeholder="Password">
-      <button @click="login">Login</button>
-      <p>Don't have an account? <a href="#" @click="toggleForm">Register</a></p>
-    </div>
+  <div class="d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="container">
 
-    <div v-else>
-      <h2>Register</h2>
-      <input type="text" v-model="username" placeholder="Username">
-      <input type="email" v-model="email" placeholder="Email">
-      <input type="password" v-model="password" placeholder="Password">
-      <button @click="register">Register</button>
-      <p>Already have an account? <a href="#" @click="toggleForm">Login</a></p>
+      <div v-if="!isRegistered" class="text-center">
+        <img class="imageDice" src="../assets/6545894.png" alt="">
+
+        <h2>Login</h2>
+        <input type="email" v-model="email" class="form-control" placeholder="Email">
+        <input type="password" v-model="password" class="form-control" placeholder="Password">
+        <button @click="login" class="btn btn-primary mt-3">Login</button>
+        <p class="mt-3">Don't have an account? <a href="#" @click="toggleForm">Register</a></p>
+      </div>
+
+      <div v-else class="text-center">
+        <h2>Register</h2>
+        <input type="text" v-model="username" class="form-control" placeholder="Username">
+        <input type="email" v-model="email" class="form-control" placeholder="Email">
+        <input type="password" v-model="password" class="form-control" placeholder="Password">
+        <button @click="register" class="btn btn-primary mt-3">Register</button>
+        <p class="mt-3">Already have an account? <a href="#" @click="toggleForm">Login</a></p>
+      </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -70,5 +77,10 @@ export default {
 </script>
 
 <style scoped>
-/* Add your styles here */
+
+.imageDice{
+height: 3rem;
+width: 3rem;
+}
+
 </style>

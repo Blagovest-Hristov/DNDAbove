@@ -1,72 +1,83 @@
 <template>
     <div v-if="character" class="character-view">
-        <div class="character-info">
-            <div class="character-header">
-                <img :src="character.photo" alt="Character Image" class="character-image">
-                <h1>{{ character.name }}</h1>
-              </div>
-            <p>Class: {{ character.class }}</p>
-            <p>Race: {{ character.race }}</p>
-            <p>Subrace: {{ character.subrace }}</p>
-            <p>Archetype: {{ character.archetype }}</p>
-            <p>Health: {{ character.health }}</p>
-            <p>Strength: {{ character.STR }}</p>
-            <p>Dexterity: {{ character.DXT }}</p>
-            <p>Constitution: {{ character.CONS }}</p>
-            <p>Intelligence: {{ character.INT }}</p>
-            <p>Wisdom: {{ character.WIS }}</p>
-            <p>Charisma: {{ character.CHA }}</p>
-            <p>Proficient Skills: {{ character.prof_skill1 }}, {{ character.prof_skill2 }}</p>
-            <button @click="showSpells = !showSpells">{{ showSpells ? 'Hide' : 'Show' }} Spells and Cantrips</button>
-            <div v-if="showSpells">
-                <h1>Spells:</h1>
-                <ul>
-                    <li v-for="(spell, index) in [character.spell1, character.spell2, character.spell3, character.spell4]"
-                        :key="index">
-                        <h3>{{ spell }}:</h3>
-                        {{ spellDescriptions[spell] }}
-                    </li>
-                </ul>
-                <p>Cantrips:</p>
-                <ul>
-                    <li v-for="(cantrip, index) in [character.cantrip1, character.cantrip2]" :key="index">
-                        <h3>{{ cantrip }}:</h3>
-                        {{ spellDescriptions[cantrip] }}
-                    </li>
-                </ul>
-            </div>
-            <button @click="showModal = true">Show Spellcasting Info</button>
-            <div v-if="showModal" class="custom-modal">
-                <div class="custom-modal-content">
-                  <span class="custom-close" @click="showModal = false">&times;</span>
-                  
-                    <h2>Spellcasting Info for {{ character.class }}</h2>
-                    <p>Level: {{ spellcasting.level }}</p>
-                    <p>Spellcasting Ability: {{ spellcasting.spellcasting_ability.name }}</p>
-                    <ul>
-                        <li v-for="(info, index) in spellcasting.info" :key="index">
-                            <h3>{{ info.name }}</h3>
-                            <p v-for="(desc, index) in info.desc" :key="index">{{ desc }}</p>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+      <div class="character-info">
+        <div class="character-header">
+          <img :src="character.photo" alt="Character Image" class="character-image">
+          <h1>{{ character.name }}</h1>
         </div>
-        <div class="skills-section">
-            <table class="skills-table">
-                <tr>
-                    <th>Skill</th>
-                    <th>Value</th>
-                </tr>
-                <tr v-for="(value, skill) in skillValues" :key="skill">
-                    <td>{{ skill }}</td>
-                    <td>{{ value }}</td>
-                </tr>
-            </table>
+        <div class="character-details">
+          <p><strong>Class:</strong> {{ character.class }}</p>
+          <p><strong>Race:</strong> {{ character.race }}</p>
+          <p v-if="character.subrace"><strong>Subrace:</strong> {{ character.subrace }}</p>
+          <p><strong>Archetype:</strong> {{ character.archetype }}</p>
+          <p><strong>Health:</strong> {{ character.health }}</p>
+          <p><strong>Attributes:</strong></p>
+          <ul class="attribute-list">
+            <li><strong>Strength:</strong> {{ character.STR }}</li>
+            <li><strong>Dexterity:</strong> {{ character.DXT }}</li>
+            <li><strong>Constitution:</strong> {{ character.CONS }}</li>
+            <li><strong>Intelligence:</strong> {{ character.INT }}</li>
+            <li><strong>Wisdom:</strong> {{ character.WIS }}</li>
+            <li><strong>Charisma:</strong> {{ character.CHA }}</li>
+          </ul>
+  
+          <button @click="showSpells = !showSpells" class="toggle-button">{{ showSpells ? 'Hide' : 'Show' }} Spells and Cantrips</button>
+          <div v-if="showSpells" class="spells-section">
+            <h2>Spells:</h2>
+            <ul class="spell-list">
+              <li v-for="(spell, index) in [character.spell1, character.spell2, character.spell3, character.spell4]" :key="index">
+                <h3>{{ spell }}:</h3>
+                {{ spellDescriptions[spell] }}
+              </li>
+            </ul>
+            <h2>Cantrips:</h2>
+            <ul class="spell-list">
+              <li v-for="(cantrip, index) in [character.cantrip1, character.cantrip2]" :key="index">
+                <h3>{{ cantrip }}:</h3>
+                {{ spellDescriptions[cantrip] }}
+              </li>
+            </ul>
+          </div>
+  
+          <button @click="showModal = true" class="toggle-button">Show Spellcasting Info</button>
+          <div v-if="showModal" class="custom-modal">
+            <div class="custom-modal-content">
+              <span class="custom-close" @click="showModal = false">&times;</span>
+              <h2>Spellcasting Info for {{ character.class }}</h2>
+              <p><strong>Level:</strong> {{ spellcasting.level }}</p>
+              <p><strong>Spellcasting Ability:</strong> {{ spellcasting.spellcasting_ability.name }}</p>
+              <ul>
+                <li v-for="(info, index) in spellcasting.info" :key="index">
+                  <h3>{{ info.name }}</h3>
+                  <p v-for="(desc, index) in info.desc" :key="index">{{ desc }}</p>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+      </div>
+  
+      <div class="skills-section">
+        <h2>Skills</h2>
+        <table class="skills-table">
+          <thead>
+            <tr>
+              <th>Skill</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(value, skill) in skillValues" :key="skill">
+              <td>{{ skill }}</td>
+              <td>{{ value }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div v-else>Loading...</div>
-</template>
+    <div v-else class="loading-message">Loading...</div>
+  </template>
+
 <script>
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from './firebase';
@@ -149,93 +160,126 @@ export default {
 <style scoped>
 .character-view {
     display: flex;
-    justify-content: space-between;
-    font-family: Arial, sans-serif;
+    justify-content: center;
+    align-items: flex-start;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .character-info {
-    width: 70%;  /* Adjust this value to suit your needs */
-}
-
-.character-view h1 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.character-view p {
-    margin-bottom: 10px;
-    color: #666;
-}
-
-.custom-modal {
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-  }
-  
-  .custom-modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-  }
-  
-  .custom-close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .custom-close:hover,
-  .custom-close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-.skills-section {
-    width: 30%;  /* Adjust this value to suit your needs */
-}
-
-table {
-    width: 60%;
-    border-collapse: collapse;
-}
-
-table,
-th,
-td {
-    border: 1px solid black;
-    padding: 10px;
-    text-align: left;
-}
-.character-photo {
-    width: 7rem;
-    border-radius: 7rem;
-    margin-bottom: 10px ;
+width: 70%;
+background-color: gray;
+padding: 20px;
+border-radius: 8px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .character-header {
-    display: flex;
-    align-items: center;
-  }
-  
-  .character-image {
-    width: 100px !important;
-    height: 100px !important;
-    margin-right: 20px !important;
-    object-fit: cover !important;
-  }
-  
+display: flex;
+align-items: center;
+}
 
+.character-image {
+width: 100px;
+height: 100px;
+border-radius: 50%;
+margin-right: 20px;
+object-fit: cover;
+border: 2px solid #333;
+}
+
+.character-info h1 {
+color: #333;
+margin-bottom: 10px;
+}
+
+.character-details p {
+margin-bottom: 8px;
+color: black;
+}
+
+.toggle-button {
+margin-top: 15px;
+padding: 8px 12px;
+background-color: #e02b2b;
+color: #fff;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+}
+
+.spells-section {
+margin-top: 20px;
+}
+
+.spell-list {
+list-style: none;
+padding-left: 0;
+}
+
+.spell-list li {
+margin-bottom: 12px;
+}
+
+.custom-modal {
+position: fixed;
+z-index: 1;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0, 0, 0, 0.4);
+}
+
+.custom-modal-content {
+background-color: darkgray;
+margin: 10% auto;
+padding: 20px;
+border-radius: 8px;
+width: 80%;
+max-width: 600px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.custom-close {
+color: #aaa;
+float: right;
+font-size: 24px;
+font-weight: bold;
+cursor: pointer;
+}
+
+.skills-section {
+width: 30%;
+padding: 20px;
+background-color: gray;
+border-radius: 8px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+margin-left: 20px;
+}
+
+.skills-section h2 {
+color: #333;
+margin-bottom: 12px;
+}
+
+.skills-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.skills-table th,
+.skills-table td {
+border: 1px solid black;
+padding: 10px;
+}
+
+.loading-message {
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 18px;
+height: 100px;
+color: #666;
+}
 </style>
