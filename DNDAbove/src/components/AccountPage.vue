@@ -18,6 +18,9 @@
             <button type="submit">Save</button>
           </form>
 
+          <button @click="logout">Logout</button>
+
+
           <!-- Show a message when username is updated -->
           <p v-if="changeSuccess">Username updated successfully!</p>
         </div>
@@ -33,7 +36,9 @@
 <script>
 import { auth, firestore } from './firebase'; 
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useRouter } from 'vue-router';
+
 
 export default {
   data() {
@@ -45,6 +50,8 @@ export default {
     };
   },
   async mounted() {
+    const router = useRouter();
+
     onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const userRef = doc(firestore, 'players', currentUser.uid); 
@@ -52,6 +59,10 @@ export default {
         if (docSnap.exists()) {
           this.user = docSnap.data();
         }
+      }
+      else {
+        router.push('/login');
+
       }
     });
   },
@@ -78,7 +89,15 @@ export default {
           console.error('Error updating username:', error);
         }
       }
-    }
+    },
+    async logout() {
+      try {
+        await signOut(auth);
+        this.user = null;
+      } catch (error) {
+        console.error('Error signing out: ', error);
+      }
+    },
   }
 };
 </script>

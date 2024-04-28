@@ -32,7 +32,7 @@ export default {
     this.showNavbar = this.$route.name !== 'login';
 
     // Example: Show error notification
-    this.$toast.error('Error message goes here');
+    this.$toast.error('Error');
   }
 }
 </script>
