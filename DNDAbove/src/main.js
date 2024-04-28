@@ -42,8 +42,13 @@ const router = createRouter({
   ],
 })
 
+const app = createApp(App);
 
-createApp(App).use(VueToast).use(router).mount('#app')
+app.config.errorHandler = function(err) {
+  console.error(err);
+}
+
+app.use(VueToast).use(router).mount('#app')
 
   
   
