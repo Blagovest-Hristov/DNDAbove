@@ -9,7 +9,14 @@
           <h3>Email: {{ user.email }}</h3>
 
           <!-- Button to toggle username change form -->
-          <button @click="toggleUsernameForm">{{ showUsernameForm ? 'Hide' : 'Change Username' }}</button>
+          <div class="button-container">
+            <button @click="toggleUsernameForm">{{ showUsernameForm ? 'Hide' : 'Change Username' }}</button>
+          </div>
+
+          <!-- Logout button -->
+          <div class="button-container">
+            <button @click="logout">Logout</button>
+          </div>
 
           <!-- Username change form -->
           <form v-if="showUsernameForm" @submit.prevent="changeUsername">
@@ -17,9 +24,6 @@
             <input type="text" id="newUsername" v-model="newUsername" required>
             <button type="submit">Save</button>
           </form>
-
-          <button @click="logout">Logout</button>
-
 
           <!-- Show a message when username is updated -->
           <p v-if="changeSuccess">Username updated successfully!</p>
@@ -32,6 +36,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import { auth, firestore } from './firebase'; 
@@ -101,3 +106,10 @@ export default {
   }
 };
 </script>
+
+
+<style scoped>
+.button-container {
+  margin-bottom: 10px;
+}
+</style>
